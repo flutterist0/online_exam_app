@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:online_exam_app/src/fetaures/auth/model/login_request_model.dart';
+import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_bloc.dart';
+import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_event.dart';
+import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_state.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -8,6 +13,11 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
+  final _formKey = GlobalKey<FormState>();
+  final _fullNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,26 +30,52 @@ class _RegisterViewState extends State<RegisterView> {
               Text('Register',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               SizedBox(height: 20),
-              TextField(
-                decoration: InputDecoration(labelText: 'Full Name'),
-              ),
-              TextField(
-                decoration: InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              TextField(
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-              ),
-              TextField(
-                decoration: InputDecoration(labelText: 'Confirm Password'),
-                obscureText: true,
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {},
-                child: Text('Register'),
-              ),
+              Form(
+                  key: _formKey,
+                  child: Column(children: [
+                    TextField(
+                      controller: _fullNameController,
+                      decoration: InputDecoration(labelText: 'Full Name'),
+                    ),
+                    TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(labelText: 'Email'),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    TextField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(labelText: 'Password'),
+                      obscureText: true,
+                    ),
+                    TextField(
+                      controller: _confirmPasswordController,
+                      decoration:
+                          InputDecoration(labelText: 'Confirm Password'),
+                      obscureText: true,
+                    ),
+                    SizedBox(height: 20),
+                    BlocConsumer<AuthBloc, AuthState>(
+                      listener: (context, state) {
+                        if (state is AuthRegisterSuccess) {
+                          Navigator.pop(context);
+                        }
+                        if (state is AuthFailure) {
+                          print('Xetaaa: ${state.error}');
+                        }
+                      },
+                      builder: (context, state) {
+                        if (state is AuthLoading) {
+                          return CircularProgressIndicator();
+                        }
+                        return ElevatedButton(
+                          onPressed: () {
+                            _validate();
+                          },
+                          child: Text('Register'),
+                        );
+                      },
+                    )
+                  ])),
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -48,6 +84,19 @@ class _RegisterViewState extends State<RegisterView> {
               )
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  _validate() {
+    _formKey.currentState?.validate();
+
+    BlocProvider.of<AuthBloc>(context).add(
+      LoginRequested(
+        LoginRequest(
+          email: _emailController.text,
+          password: _passwordController.text,
         ),
       ),
     );
