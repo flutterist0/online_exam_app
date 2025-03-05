@@ -8,6 +8,7 @@ import 'package:online_exam_app/src/fetaures/auth/presentation/view/log_in.dart'
 import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_bloc.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_event.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_state.dart';
+import 'package:online_exam_app/src/fetaures/exam/presentation/view/exam_detail.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/widget/exam_card.dart';
 
 class ExamsView extends StatefulWidget {
@@ -35,6 +36,7 @@ class _ExamsViewState extends State<ExamsView> {
     print('Token: $token');
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.deepPurple,
         title: Text('Exams'),
         actions: [
           IconButton(
@@ -74,6 +76,12 @@ class _ExamsViewState extends State<ExamsView> {
                       title: exams[index].title ?? 'No title',
                       description: exams[index].description ?? 'No description',
                       date: exams[index].createdTime ?? DateTime.now(),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ExamDetailView()));
+                      },
                     );
                   },
                 ),
