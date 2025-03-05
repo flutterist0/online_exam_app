@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:online_exam_app/src/fetaures/auth/model/login_response_model.dart';
+import 'package:online_exam_app/src/fetaures/auth/model/register_response_model.dart';
 
 abstract class AuthState extends Equatable {
   const AuthState();
@@ -13,7 +14,7 @@ class AuthInitial extends AuthState {}
 class AuthLoading extends AuthState {}
 
 class AuthLoginSuccess extends AuthState {
-  final LoginResponseModel loginModel;
+  final LoginResponseModel? loginModel;
 
   const AuthLoginSuccess(this.loginModel);
 
@@ -22,7 +23,7 @@ class AuthLoginSuccess extends AuthState {
 }
 
 class AuthRegisterSuccess extends AuthState {
-  final LoginResponseModel registerModel;
+  final RegisterResponseModel registerModel;
 
   const AuthRegisterSuccess(this.registerModel);
 
@@ -31,7 +32,7 @@ class AuthRegisterSuccess extends AuthState {
 }
 
 class AuthFailure extends AuthState {
-  final String error;
+  final String? error;
 
   const AuthFailure(this.error);
 

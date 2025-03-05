@@ -1,0 +1,40 @@
+import 'package:dio/dio.dart';
+import 'package:online_exam_app/src/core/resource/data_state.dart';
+import 'package:online_exam_app/src/fetaures/exam/model/exam_model.dart';
+import 'package:online_exam_app/src/fetaures/exam/repository/exam_repo.dart';
+import 'package:online_exam_app/src/fetaures/exam/service/exam_service.dart';
+
+class ExamRepositoryImpl implements ExamRepository {
+  final ExamService _examService;
+  const ExamRepositoryImpl(this._examService);
+
+  @override
+  Future<DataState<ExamModel>> getAllExams() async {
+    try {
+      final httpResponse = await _examService.getAllExams();
+      if (httpResponse.response.statusCode == 200) {
+        return DataSuccess(httpResponse.data);
+      } else {
+        return DataFailed(
+          DioException(
+            requestOptions: httpResponse.response.requestOptions,
+            error: httpResponse.response.data,
+            type: DioExceptionType.badResponse,
+            response: Response<ErrorResponseModel>(
+              requestOptions: httpResponse.response.requestOptions,
+              data: ErrorResponseModel.fromJson(httpResponse.response.data),
+            ),
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      print('${e.message}');
+      return DataFailed(e.copyWith(
+        response: Response<ErrorResponseModel>(
+          requestOptions: e.requestOptions,
+          data: ErrorResponseModel.fromJson(e.response?.data),
+        ),
+      ));
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:online_exam_app/src/fetaures/auth/model/login_request_model.dart';
+import 'package:online_exam_app/src/fetaures/auth/model/register_request_model.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_bloc.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_event.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_state.dart';
@@ -93,8 +94,10 @@ class _RegisterViewState extends State<RegisterView> {
     _formKey.currentState?.validate();
 
     BlocProvider.of<AuthBloc>(context).add(
-      LoginRequested(
-        LoginRequest(
+      RegisterRequested(
+        RegisterRequest(
+          rePassword: _confirmPasswordController.text,
+          fullName: _fullNameController.text,
           email: _emailController.text,
           password: _passwordController.text,
         ),

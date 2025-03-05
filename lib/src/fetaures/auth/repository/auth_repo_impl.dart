@@ -16,12 +16,17 @@ class AuthRepositoryImpl implements AuthRepository {
       LoginRequest loginRequestModel) async {
     try {
       final httpResponse = await _authService.login(loginRequestModel);
-      if (httpResponse.response.statusCode == 200 &&
-          httpResponse.response.data['code'] == 200) {
-        String token = httpResponse.response.data['token'];
+      if (httpResponse.response.statusCode == 200) {
+        final responseData = httpResponse.response.data;
+
+        final loginResponse = LoginResponseModel.fromJson(responseData);
+
+        String token = httpResponse.data.token!;
+        print("Login Token: $token");
         await SecureStorage.saveToken(token);
-        return DataSuccess(httpResponse.response.data);
+        return DataSuccess(loginResponse);
       } else {
+        print('Xeta');
         return DataFailed(
           DioException(
             requestOptions: httpResponse.response.requestOptions,
@@ -35,6 +40,7 @@ class AuthRepositoryImpl implements AuthRepository {
         );
       }
     } on DioException catch (e) {
+      print('${e.message}');
       return DataFailed(e.copyWith(
         response: Response<ErrorResponseModel>(
           requestOptions: e.requestOptions,
