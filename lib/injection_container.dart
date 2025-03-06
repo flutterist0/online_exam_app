@@ -42,7 +42,7 @@ Future<void> initializeDependencies() async {
   );
   s1.registerLazySingleton<ExamService>(
     () => ExamService(
-      s1<Dio>(instanceName: 'initialDio'),
+      s1<Dio>(instanceName: 'baseDio'),
     ),
   );
 

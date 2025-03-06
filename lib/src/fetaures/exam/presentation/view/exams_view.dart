@@ -25,77 +25,92 @@ class _ExamsViewState extends State<ExamsView> {
     BlocProvider.of<ExamBloc>(context).add(const GetAllExams());
   }
 
+  Future<void> _refreshExams() async {
+    BlocProvider.of<ExamBloc>(context).add(const GetAllExams());
+  }
+
   @override
   Widget build(BuildContext context) {
     print('UserId: ${widget.userId}');
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
-        title: Text('Exams'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              BlocProvider.of<AuthBloc>(context).add(const LogoutRequested());
-              Navigator.pushReplacement(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => const LoginView(),
-                ),
-              );
-            },
-            icon: const Icon(Icons.logout),
-          )
-        ],
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          BlocBuilder<ExamBloc, ExamState>(builder: (context, state) {
-            if (state is ExamLoading) {
-              return Center(child: const CircularProgressIndicator());
-            } else if (state is ExamGetAllSuccess) {
-              final exams = state.examModel!.data
-                  ?.where((exam) => exam.isDeleted == false)
-                  .toList();
-              if (exams == null || exams.isEmpty) {
-                return const Center(
-                    child: Text('No incomplete exams available'));
+    return RefreshIndicator(
+      onRefresh: _refreshExams,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.deepPurple,
+          title: Text('Exams'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                BlocProvider.of<AuthBloc>(context).add(const LogoutRequested());
+                Navigator.pushReplacement(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => const LoginView(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.logout),
+            )
+          ],
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            BlocBuilder<ExamBloc, ExamState>(builder: (context, state) {
+              if (state is ExamLoading) {
+                return Center(child: const CircularProgressIndicator());
+              } else if (state is ExamGetAllSuccess) {
+                final exams = state.examModel!.data
+                    ?.where((exam) => exam.isDeleted == false)
+                    .toList();
+                if (exams == null || exams.isEmpty) {
+                  return const Center(
+                      child: Text('No incomplete exams available'));
+                }
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: exams.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return ExamCard(
+                        title: exams[index].title ?? 'No title',
+                        description:
+                            exams[index].description ?? 'No description',
+                        date: exams[index].createdTime ?? DateTime.now(),
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => BlocProvider.value(
+                                        value:
+                                            BlocProvider.of<ExamBloc>(context),
+                                        child: ExamDetailView(
+                                          examId: exams[index].id,
+                                          userId: widget.userId,
+                                        ),
+                                      )));
+                        },
+                      );
+                    },
+                  ),
+                );
+              } else if (state is ExamFailure) {
+                return Center(
+                  child: Text('Error: ${state.errorMessage}'),
+                );
               }
-              return Expanded(
-                child: ListView.builder(
-                  itemCount: exams.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return ExamCard(
-                      title: exams[index].title ?? 'No title',
-                      description: exams[index].description ?? 'No description',
-                      date: exams[index].createdTime ?? DateTime.now(),
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => BlocProvider.value(
-                                      value: BlocProvider.of<ExamBloc>(context),
-                                      child: ExamDetailView(
-                                        examId: exams[index].id,
-                                        userId: widget.userId,
-                                      ),
-                                    )));
-                      },
-                    );
-                  },
-                ),
-              );
-            } else if (state is ExamFailure) {
               return Center(
-                child: Text('Error: ${state.errorMessage}'),
-              );
-            }
-            return const Center(
-              child: Text('No data available'),
-            );
-          }),
-        ],
+                  child: IconButton(
+                      onPressed: () {
+                        _refreshExams();
+                      },
+                      icon: Icon(
+                        Icons.refresh,
+                        size: 60,
+                      )));
+            }),
+          ],
+        ),
       ),
     );
   }

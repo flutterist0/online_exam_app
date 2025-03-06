@@ -23,7 +23,7 @@ void main() async {
           create: (_) => s1<AuthBloc>(),
         ),
         BlocProvider<ExamBloc>(
-          create: (_) => s1<ExamBloc>()..add(GetAllExams()),
+          create: (_) => s1<ExamBloc>(),
         ),
       ],
       child: MyApp(
