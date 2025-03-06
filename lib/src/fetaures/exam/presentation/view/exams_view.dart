@@ -12,8 +12,8 @@ import 'package:online_exam_app/src/fetaures/exam/presentation/view/exam_detail.
 import 'package:online_exam_app/src/fetaures/exam/presentation/widget/exam_card.dart';
 
 class ExamsView extends StatefulWidget {
-  const ExamsView({super.key});
-
+  const ExamsView({super.key, this.userId});
+  final int? userId;
   @override
   State<ExamsView> createState() => _ExamsViewState();
 }
@@ -25,15 +25,9 @@ class _ExamsViewState extends State<ExamsView> {
     BlocProvider.of<ExamBloc>(context).add(const GetAllExams());
   }
 
-  String? token;
-  void getToken() async {
-    token = await SecureStorage.readToken();
-    print('Token: $token');
-  }
-
   @override
   Widget build(BuildContext context) {
-    print('Token: $token');
+    print('UserId: ${widget.userId}');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepPurple,
@@ -80,7 +74,13 @@ class _ExamsViewState extends State<ExamsView> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ExamDetailView()));
+                                builder: (context) => BlocProvider.value(
+                                      value: BlocProvider.of<ExamBloc>(context),
+                                      child: ExamDetailView(
+                                        examId: exams[index].id,
+                                        userId: widget.userId,
+                                      ),
+                                    )));
                       },
                     );
                   },

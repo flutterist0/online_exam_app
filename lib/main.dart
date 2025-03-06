@@ -7,6 +7,7 @@ import 'package:online_exam_app/src/core/storage/secure_storage.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_bloc.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/view/log_in.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_bloc.dart';
+import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_event.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/view/exams_view.dart';
 
 void main() async {
@@ -22,7 +23,7 @@ void main() async {
           create: (_) => s1<AuthBloc>(),
         ),
         BlocProvider<ExamBloc>(
-          create: (_) => s1<ExamBloc>(),
+          create: (_) => s1<ExamBloc>()..add(GetAllExams()),
         ),
       ],
       child: MyApp(

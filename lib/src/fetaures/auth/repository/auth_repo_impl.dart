@@ -22,8 +22,10 @@ class AuthRepositoryImpl implements AuthRepository {
         final loginResponse = LoginResponseModel.fromJson(responseData);
 
         String token = httpResponse.data.token!;
+        int userId = httpResponse.data.userId!;
         print("Login Token: $token");
         await SecureStorage.saveToken(token);
+        await SecureStorage.saveUserId(userId);
         return DataSuccess(loginResponse);
       } else {
         print('Xeta');

@@ -1,118 +1,186 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:online_exam_app/src/core/storage/secure_storage.dart';
+import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_bloc.dart';
+import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_state.dart';
+import 'package:online_exam_app/src/fetaures/exam/model/submit_exam_request_model.dart';
+import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_bloc.dart';
+import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_event.dart';
+import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_state.dart';
 
 class ExamDetailView extends StatefulWidget {
-  const ExamDetailView({super.key});
-
+  const ExamDetailView({super.key, this.examId, this.userId});
+  final int? examId;
+  final int? userId;
   @override
   State<ExamDetailView> createState() => _ExamDetailViewState();
 }
 
 class _ExamDetailViewState extends State<ExamDetailView> {
-  final Map<String, dynamic> examData = {
-    "title": "First Exam",
-    "description": "Good Luck!",
-    "questions": [
-      {
-        "questionId": 2,
-        "text": "Question2",
-        "answers": [
-          {"answerId": 1, "text": "A"},
-          {"answerId": 2, "text": "B"},
-          {"answerId": 3, "text": "C"},
-          {"answerId": 4, "text": "D"}
-        ]
-      },
-      {
-        "questionId": 3,
-        "text": "Sual1",
-        "answers": [
-          {"answerId": 5, "text": "A"},
-          {"answerId": 6, "text": "B"},
-          {"answerId": 7, "text": "C"}
-        ]
-      }
-    ]
-  };
-
   Map<int, int?> selectedAnswers = {};
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    BlocProvider.of<ExamBloc>(context)
+        .add(GetExamDetail(examId: widget.examId));
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(examData["title"]),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              examData["description"],
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: examData["questions"].length,
-                itemBuilder: (context, index) {
-                  var question = examData["questions"][index];
-                  return Card(
-                    margin: EdgeInsets.only(bottom: 15),
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "${index + 1}. ${question["text"]}",
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 10),
-                          ...List.generate(question["answers"].length, (i) {
-                            var answer = question["answers"][i];
-                            return RadioListTile<int>(
-                              title: Text(answer["text"]),
-                              value: answer["answerId"],
-                              groupValue:
-                                  selectedAnswers[question["questionId"]],
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedAnswers[question["questionId"]] =
-                                      value;
-                                });
-                              },
-                              activeColor: Colors.deepPurple,
-                            );
-                          })
-                        ],
-                      ),
-                    ),
+    print('ExamDetail UserId: ${widget.userId}');
+    return BlocListener<ExamBloc, ExamState>(
+      listener: (context, state) {
+        if (state is SubmitExamSuccess) {
+          _showSuccessDialog(context);
+        }
+      },
+      child: BlocBuilder<ExamBloc, ExamState>(builder: (context, state) {
+        if (state is ExamLoading) {
+          return Center(child: const CircularProgressIndicator());
+        } else if (state is ExamDetailSuccess) {
+          final exams = state.examDetailModel!.data;
+          if (exams == null) {
+            return const Center(child: Text('No exams available'));
+          }
+          return Scaffold(
+            bottomNavigationBar: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () async {
+                  if (selectedAnswers.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Please answer all questions")),
+                    );
+                    return;
+                  }
+
+                  final answersList = selectedAnswers.entries
+                      .map((entry) => SubmitExamRequestModelAnswers(
+                            questionId: entry.key,
+                            answerId: entry.value,
+                          ))
+                      .toList();
+                  print('${answersList.length}');
+                  int? userId = await SecureStorage.readUserId();
+                  final submitRequest = SubmitExamRequestModel(
+                    userId: userId,
+                    examId: widget.examId,
+                    answers: answersList,
                   );
+                  print('${submitRequest.toJson()}');
+
+                  BlocProvider.of<ExamBloc>(context).add(
+                      SubmitExamEvent(submitExamRequestModel: submitRequest));
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  textStyle: TextStyle(fontSize: 18),
+                ),
+                child: const Text(
+                  "Submit",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                print(selectedAnswers);
-              },
-              child: Text("Submit"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-                padding: EdgeInsets.symmetric(vertical: 12),
-                textStyle: TextStyle(fontSize: 18),
+            appBar: AppBar(
+              title: Text('${exams.title}'),
+              backgroundColor: Colors.deepPurple,
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${exams.description}',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                  ),
+                  SizedBox(height: 20),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: exams.questions?.length,
+                      itemBuilder: (context, index) {
+                        var question = exams.questions?[index];
+                        return Card(
+                          margin: EdgeInsets.only(bottom: 15),
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${index + 1}. ${question?.text}",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 10),
+                                ...List.generate(question!.answers!.length,
+                                    (i) {
+                                  var answer = question.answers?[i];
+                                  return RadioListTile<int>(
+                                    title: Text('${answer?.text}'),
+                                    value: answer!.answerId!,
+                                    groupValue:
+                                        selectedAnswers[question.questionId],
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedAnswers[question.questionId!] =
+                                            value;
+                                      });
+                                    },
+                                    activeColor: Colors.deepPurple,
+                                  );
+                                })
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                ],
               ),
-            )
+            ),
+          );
+        } else if (state is ExamFailure) {
+          return Center(
+            child: Text('Error: ${state.errorMessage}'),
+          );
+        }
+        return const Center(
+          child: Text('No data available'),
+        );
+      }),
+    );
+  }
+
+  void _showSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Success"),
+          content: const Text("Exam submitted successfully!"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+              child: const Text("OK"),
+            ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 }

@@ -42,7 +42,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LogoutRequested>((event, emit) async {
       emit(AuthLoading());
       try {
-        SecureStorage.deleteToken();
+        await SecureStorage.deleteToken();
+        await SecureStorage.deleteUserId();
         print('token silindi');
 
         emit(AuthInitial());

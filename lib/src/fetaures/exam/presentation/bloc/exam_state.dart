@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:online_exam_app/src/fetaures/exam/model/exam_detail_model.dart';
 import 'package:online_exam_app/src/fetaures/exam/model/exam_model.dart';
 
 abstract class ExamState extends Equatable {
@@ -17,6 +18,17 @@ class ExamGetAllSuccess extends ExamState {
   const ExamGetAllSuccess(this.examModel);
   @override
   List<Object?> get props => [examModel];
+}
+
+class ExamDetailSuccess extends ExamState {
+  final ExamDetailModel? examDetailModel;
+  const ExamDetailSuccess(this.examDetailModel);
+  @override
+  List<Object?> get props => [examDetailModel];
+}
+
+class SubmitExamSuccess extends ExamState {
+  const SubmitExamSuccess();
 }
 
 class ExamFailure extends ExamState {

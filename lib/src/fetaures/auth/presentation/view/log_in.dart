@@ -50,8 +50,13 @@ class _LoginViewState extends State<LoginView> {
                   SizedBox(height: 20),
                   BlocConsumer<AuthBloc, AuthState>(listener: (context, state) {
                     if (state is AuthLoginSuccess) {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => ExamsView()));
+                      print('${state.loginModel?.userId}');
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ExamsView(
+                                    userId: state.loginModel?.userId,
+                                  )));
                     }
                     if (state is AuthFailure) {
                       print('Xetaaa: ${state.error}');

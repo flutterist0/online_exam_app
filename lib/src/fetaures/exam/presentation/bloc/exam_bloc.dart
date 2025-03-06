@@ -11,7 +11,29 @@ class ExamBloc extends Bloc<ExamEvent, ExamState> {
       emit(ExamLoading());
       final dataState = await examRepository.getAllExams();
       if (dataState is DataSuccess && dataState.data != null) {
+        print('Exams:${dataState.data!.data?.length}');
         emit(ExamGetAllSuccess(dataState.data!));
+      } else {
+        emit(ExamFailure(dataState.error?.message));
+      }
+    });
+
+    on<GetExamDetail>((event, emit) async {
+      emit(ExamLoading());
+      final dataState = await examRepository.getExamDetail(event.examId!);
+      if (dataState is DataSuccess && dataState.data != null) {
+        emit(ExamDetailSuccess(dataState.data!));
+      } else {
+        emit(ExamFailure(dataState.error?.message));
+      }
+    });
+
+    on<SubmitExamEvent>((event, emit) async {
+      emit(ExamLoading());
+      final dataState =
+          await examRepository.submitExam(event.submitExamRequestModel!);
+      if (dataState is DataSuccess && dataState.data != null) {
+        emit(SubmitExamSuccess());
       } else {
         emit(ExamFailure(dataState.error?.message));
       }
