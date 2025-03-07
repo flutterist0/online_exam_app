@@ -21,3 +21,18 @@ class SubmitExamEvent extends ExamEvent {
   final SubmitExamRequestModel? submitExamRequestModel;
   const SubmitExamEvent({this.submitExamRequestModel});
 }
+
+class ResetSubmitSuccessEvent extends ExamEvent {
+  const ResetSubmitSuccessEvent();
+}
+
+class GetExamResultEvent extends ExamEvent {
+  final int? userId;
+  final int? examId;
+  const GetExamResultEvent({this.userId, this.examId});
+}
+
+class GetExamsResultsEvent extends ExamEvent {
+  final int? userId;
+  const GetExamsResultsEvent({this.userId});
+}

@@ -6,12 +6,14 @@ class ExamCard extends StatelessWidget {
   final String description;
   final DateTime date;
   final VoidCallback onTap;
+  final IconData? icon;
   const ExamCard({
     Key? key,
     required this.title,
     required this.description,
     required this.date,
     required this.onTap,
+    this.icon,
   }) : super(key: key);
 
   @override
@@ -29,13 +31,19 @@ class ExamCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue.shade700,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade700,
+                    ),
+                  ),
+                  Icon(icon)
+                ],
               ),
               const SizedBox(height: 8),
               Text(

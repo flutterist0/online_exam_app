@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:online_exam_app/src/core/constant/url_const.dart';
 import 'package:online_exam_app/src/fetaures/exam/model/exam_detail_model.dart';
 import 'package:online_exam_app/src/fetaures/exam/model/exam_model.dart';
+import 'package:online_exam_app/src/fetaures/exam/model/exam_result_model.dart';
+import 'package:online_exam_app/src/fetaures/exam/model/exam_results_model.dart';
 import 'package:online_exam_app/src/fetaures/exam/model/submit_exam_request_model.dart';
 import 'package:retrofit/retrofit.dart';
 part 'exam_service.g.dart';
@@ -22,4 +24,13 @@ abstract class ExamService {
   @POST(UrlConst.submitExam)
   Future<HttpResponse<void>> submitExam(
       @Body() SubmitExamRequestModel submitExamRequestModel);
+
+  @GET(UrlConst.examResult)
+  Future<HttpResponse<ExamResultModel>> getExamResult(
+      @Query('userId') int userId, @Query('examId') int examId);
+
+  @GET(UrlConst.examResults)
+  Future<HttpResponse<ExamResultsModel>> getExamResults(
+    @Query('userId') int userId,
+  );
 }

@@ -15,6 +15,7 @@ ExamDataModel _$ExamDataModelFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['createdTime'] as String),
       isDeleted: json['isDeleted'] as bool?,
+      hasParticipated: json['hasParticipated'] as bool?,
     );
 
 Map<String, dynamic> _$ExamDataModelToJson(ExamDataModel instance) =>
@@ -24,6 +25,7 @@ Map<String, dynamic> _$ExamDataModelToJson(ExamDataModel instance) =>
       'description': instance.description,
       'createdTime': instance.createdTime?.toIso8601String(),
       'isDeleted': instance.isDeleted,
+      'hasParticipated': instance.hasParticipated,
     };
 
 ExamModel _$ExamModelFromJson(Map<String, dynamic> json) => ExamModel(

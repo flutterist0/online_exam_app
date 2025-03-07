@@ -8,11 +8,14 @@ import 'package:online_exam_app/src/fetaures/exam/model/submit_exam_request_mode
 import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_bloc.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_event.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_state.dart';
+import 'package:online_exam_app/src/fetaures/exam/presentation/view/exam_result_view.dart';
 
 class ExamDetailView extends StatefulWidget {
-  const ExamDetailView({super.key, this.examId, this.userId});
+  const ExamDetailView({
+    super.key,
+    this.examId,
+  });
   final int? examId;
-  final int? userId;
   @override
   State<ExamDetailView> createState() => _ExamDetailViewState();
 }
@@ -30,17 +33,18 @@ class _ExamDetailViewState extends State<ExamDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    print('ExamDetail UserId: ${widget.userId}');
     return BlocListener<ExamBloc, ExamState>(
       listener: (context, state) {
-        if (state is SubmitExamSuccess) {
+        if (state.isSubmitSuccess) {
           _showSuccessDialog(context);
+          _showSuccessDialog(context);
+          BlocProvider.of<ExamBloc>(context).add(ResetSubmitSuccessEvent());
         }
       },
       child: BlocBuilder<ExamBloc, ExamState>(builder: (context, state) {
-        if (state is ExamLoading) {
+        if (state.isLoading) {
           return Center(child: const CircularProgressIndicator());
-        } else if (state is ExamDetailSuccess) {
+        } else if (state.examDetailModel != null) {
           final exams = state.examDetailModel!.data;
           if (exams == null) {
             return const Center(child: Text('No exams available'));
@@ -89,6 +93,16 @@ class _ExamDetailViewState extends State<ExamDetailView> {
             appBar: AppBar(
               title: Text('${exams.title}'),
               backgroundColor: Colors.deepPurple,
+              actions: [
+                IconButton(
+                  onPressed: () async {
+                    int? userId = await SecureStorage.readUserId();
+                    BlocProvider.of<ExamBloc>(context).add(GetExamResultEvent(
+                        userId: userId, examId: widget.examId));
+                  },
+                  icon: Icon(Icons.add),
+                )
+              ],
             ),
             body: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -151,7 +165,7 @@ class _ExamDetailViewState extends State<ExamDetailView> {
               ),
             ),
           );
-        } else if (state is ExamFailure) {
+        } else if (state.errorMessage != null) {
           return Center(
             child: Text('Error: ${state.errorMessage}'),
           );
@@ -177,6 +191,17 @@ class _ExamDetailViewState extends State<ExamDetailView> {
                 Navigator.of(context).pop();
               },
               child: const Text("OK"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ExamResultView(
+                              examId: widget.examId,
+                            )));
+              },
+              child: const Text("Go to result"),
             ),
           ],
         );

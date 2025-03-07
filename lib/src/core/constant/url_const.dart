@@ -5,4 +5,6 @@ abstract class UrlConst {
   static const String getAllExams = 'Exam/getAllExams/';
   static const String examDetail = 'Exam/examDetail/{examId}';
   static const String submitExam = 'Exam/submitExam/';
+  static const String examResult = 'ExamResult/getExamResults';
+  static const String examResults = 'ExamResult/getExamResultsByUserId';
 }

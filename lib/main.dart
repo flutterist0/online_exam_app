@@ -8,6 +8,7 @@ import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_bloc.da
 import 'package:online_exam_app/src/fetaures/auth/presentation/view/log_in.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_bloc.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_event.dart';
+import 'package:online_exam_app/src/fetaures/exam/presentation/view/exam_result_view.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/view/exams_view.dart';
 
 void main() async {
@@ -47,12 +48,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: isLoggedIn ? ExamsView() : LoginView(),
+      // home: ExamResultView(),
     );
   }
 }
