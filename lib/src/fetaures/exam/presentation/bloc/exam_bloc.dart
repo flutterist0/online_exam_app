@@ -18,7 +18,6 @@ class ExamBloc extends Bloc<ExamEvent, ExamState> {
             isLoading: false, errorMessage: dataState.error?.message));
       }
     });
-
     on<GetExamDetail>((event, emit) async {
       emit(state.copyWith(isLoading: true));
       final dataState = await examRepository.getExamDetail(event.examId!);
