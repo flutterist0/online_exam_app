@@ -71,7 +71,8 @@ class _ExamsViewState extends State<ExamsView> {
             return Center(child: Text('Error: ${state.errorMessage}'));
           } else if (state.examModel != null) {
             final exams = state.examModel!.data
-                ?.where((exam) => exam.isDeleted == false)
+                ?.where((exam) =>
+                    exam.isDeleted == false && exam.hasParticipated == false)
                 .toList();
 
             if (exams == null || exams.isEmpty) {

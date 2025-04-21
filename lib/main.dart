@@ -6,6 +6,7 @@ import 'package:online_exam_app/injection_container.dart';
 import 'package:online_exam_app/src/core/storage/secure_storage.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_bloc.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/view/log_in.dart';
+import 'package:online_exam_app/src/fetaures/auth/presentation/view/otp_view.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_bloc.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/bloc/exam_event.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/view/exam_result_view.dart';
@@ -44,7 +45,6 @@ class MyHttpOverrides extends HttpOverrides {
 class MyApp extends StatelessWidget {
   const MyApp({super.key, required this.isLoggedIn});
   final bool isLoggedIn;
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -54,8 +54,18 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: isLoggedIn ? ExamsView() : LoginView(),
-      // home: ExamResultView(),
+      home: FutureBuilder<int?>(
+        future: SecureStorage.readUserId(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else {
+            final userId = snapshot.data;
+            return isLoggedIn ? PinCodeScreen(userId: userId) : LoginView();
+          }
+        },
+      ),
+      // home: PinCodeScreen(),
     );
   }
 }

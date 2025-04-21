@@ -4,6 +4,7 @@ import 'package:online_exam_app/src/fetaures/auth/model/login_request_model.dart
 import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_bloc.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_event.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_state.dart';
+import 'package:online_exam_app/src/fetaures/auth/presentation/view/otp_view.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/view/register.dart';
 import 'package:online_exam_app/src/fetaures/exam/presentation/view/exams_view.dart';
 
@@ -51,12 +52,22 @@ class _LoginViewState extends State<LoginView> {
                   BlocConsumer<AuthBloc, AuthState>(listener: (context, state) {
                     if (state is AuthLoginSuccess) {
                       print('${state.loginModel?.userId}');
+                      // Navigator.pushReplacement(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => ExamsView(
+                      //               userId: state.loginModel?.userId,
+                      //             )));
+
                       Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ExamsView(
-                                    userId: state.loginModel?.userId,
-                                  )));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PinCodeScreen(
+                            pinCode: state.loginModel?.pinCode,
+                            userId: state.loginModel?.userId,
+                          ),
+                        ),
+                      );
                     }
                     if (state is AuthFailure) {
                       print('Xetaaa: ${state.error}');

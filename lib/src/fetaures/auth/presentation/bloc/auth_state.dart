@@ -39,3 +39,10 @@ class AuthFailure extends AuthState {
   @override
   List<Object?> get props => [error];
 }
+
+class AuthPinSuccess extends AuthState {
+  const AuthPinSuccess();
+
+  @override
+  List<Object?> get props => [];
+}

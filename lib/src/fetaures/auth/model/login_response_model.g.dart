@@ -8,6 +8,7 @@ part of 'login_response_model.dart';
 
 LoginResponseModel _$LoginResponseModelFromJson(Map<String, dynamic> json) =>
     LoginResponseModel(
+      json['pinCode'] as String?,
       token: json['token'] as String?,
       expiration: json['expiration'] as String?,
       userId: (json['userId'] as num?)?.toInt(),
@@ -18,4 +19,5 @@ Map<String, dynamic> _$LoginResponseModelToJson(LoginResponseModel instance) =>
       'token': instance.token,
       'expiration': instance.expiration,
       'userId': instance.userId,
+      'pinCode': instance.pinCode,
     };

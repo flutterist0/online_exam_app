@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:online_exam_app/src/core/constant/url_const.dart';
+import 'package:online_exam_app/src/fetaures/auth/model/pin_response_model.dart';
 import 'package:online_exam_app/src/fetaures/auth/model/login_request_model.dart';
 import 'package:online_exam_app/src/fetaures/auth/model/login_response_model.dart';
 import 'package:online_exam_app/src/fetaures/auth/model/register_request_model.dart';
 import 'package:online_exam_app/src/fetaures/auth/model/register_response_model.dart';
+import 'package:online_exam_app/src/fetaures/auth/model/set_pin_request_model.dart';
 import 'package:retrofit/retrofit.dart';
 part 'auth_service.g.dart';
 
@@ -20,4 +22,12 @@ abstract class AuthService {
   @POST(UrlConst.register)
   Future<HttpResponse<RegisterResponseModel>> register(
       @Body() RegisterRequest registerRequestModel);
+
+  @POST(UrlConst.setPin)
+  Future<HttpResponse<PinResponseModel>> setPin(
+      @Body() SetPinRequestModel setPinRequestModel);
+
+  @POST(UrlConst.checkPin)
+  Future<HttpResponse<PinResponseModel>> checkPin(
+      @Body() SetPinRequestModel setPinRequestModel);
 }

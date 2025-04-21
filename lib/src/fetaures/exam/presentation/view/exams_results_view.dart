@@ -68,7 +68,11 @@ class _ExamsResultsViewState extends State<ExamsResultsView> {
               return const Center(child: CircularProgressIndicator());
             }
 
-            final exams = state.examModel?.data;
+            final exams = state.examModel?.data
+                ?.where((exam) =>
+                    exam.isDeleted == false && exam.hasParticipated == true)
+                .toList();
+            ;
             if (exams == null || exams.isEmpty) {
               return const Center(child: Text("No exams available"));
             }

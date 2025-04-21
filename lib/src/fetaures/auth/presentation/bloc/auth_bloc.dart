@@ -51,5 +51,43 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthFailure('Failed to logout'));
       }
     });
+    on<SetPinEvent>((event, emit) async {
+      emit(AuthLoading());
+      try {
+        final dataState = await authRepository.setPin(event.setPinRequestModel);
+
+        if (dataState is DataSuccess && dataState.data != null) {
+          emit(
+            AuthPinSuccess(),
+          );
+        } else {
+          emit(
+            AuthFailure(dataState.error?.message),
+          );
+        }
+      } catch (e) {
+        print("Error: $e");
+        emit(AuthFailure('Failed to check pin'));
+      }
+    });
+    on<CheckPinEvent>((event, emit) async {
+      emit(AuthLoading());
+      try {
+        final dataState =
+            await authRepository.checkPin(event.setPinRequestModel);
+        if (dataState is DataSuccess) {
+          emit(
+            AuthPinSuccess(),
+          );
+        } else {
+          emit(
+            AuthFailure('Pin kod duzgun deyill!!'),
+          );
+        }
+      } catch (e) {
+        print("Error: $e");
+        emit(AuthFailure('Failed to set pin'));
+      }
+    });
   }
 }
