@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:online_exam_app/src/core/storage/secure_storage.dart';
 import 'package:online_exam_app/src/fetaures/auth/model/set_pin_request_model.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_bloc.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_event.dart';
@@ -20,6 +21,23 @@ class PinCodeScreen extends StatefulWidget {
 
 class _PinCodeScreenState extends State<PinCodeScreen> {
   String enteredPin = "";
+
+  String? storedPin;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStoredPin();
+  }
+
+  Future<void> _loadStoredPin() async {
+    if (widget.userId != null) {
+      final pin = await SecureStorage.readPinCodeForUser(widget.userId!);
+      setState(() {
+        storedPin = pin;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +87,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  widget.pinCode == null
+                  storedPin == null
                       ? Text('Set Pin Code',
                           style: TextStyle(
                               fontSize: 24, fontWeight: FontWeight.bold))
@@ -80,26 +98,28 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
                   Pinput(
                     length: 4,
                     keyboardType: TextInputType.number,
-                    onCompleted: (pin) {
+                    onCompleted: (pin) async {
                       enteredPin = pin;
 
                       final userId = widget.userId ?? 0;
-                      print('UserId: $userId');
                       final request = SetPinRequestModel(
                         userId: userId,
                         pinCode: enteredPin,
                       );
-                      print('Request1: ${request.userId} ${request.pinCode} ');
-
-                      if (widget.pinCode == null || widget.pinCode!.isEmpty) {
-                        print('Set Pin: ${request.pinCode}');
+                      if (storedPin == null || storedPin!.isEmpty) {
+                        await SecureStorage.savePinCodeForUser(
+                            userId, enteredPin);
                         BlocProvider.of<AuthBloc>(context)
                             .add(SetPinEvent(request));
                       } else {
-                        print('Check Pin: ${request.pinCode}');
-
-                        BlocProvider.of<AuthBloc>(context)
-                            .add(CheckPinEvent(request));
+                        if (enteredPin == storedPin) {
+                          BlocProvider.of<AuthBloc>(context)
+                              .add(CheckPinEvent(request));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('PIN səhvdir')),
+                          );
+                        }
                       }
                     },
                   ),

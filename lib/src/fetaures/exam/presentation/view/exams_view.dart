@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:online_exam_app/src/core/storage/secure_storage.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_bloc.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/bloc/auth_event.dart';
 import 'package:online_exam_app/src/fetaures/auth/presentation/view/log_in.dart';
@@ -40,8 +41,9 @@ class _ExamsViewState extends State<ExamsView> {
           title: const Text('Exams'),
           actions: [
             IconButton(
-              onPressed: () {
+              onPressed: () async {
                 BlocProvider.of<AuthBloc>(context).add(const LogoutRequested());
+                await SecureStorage.deletePinCodeForUser(widget.userId!);
                 Navigator.pushReplacement(
                   context,
                   CupertinoPageRoute(

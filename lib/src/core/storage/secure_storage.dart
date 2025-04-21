@@ -58,4 +58,16 @@ class SecureStorage {
   static Future<void> deleteUserId() async {
     await _storage.delete(key: 'userId');
   }
+
+  static Future<void> savePinCodeForUser(int userId, String pinCode) async {
+    await _storage.write(key: 'pinCode_$userId', value: pinCode);
+  }
+
+  static Future<String?> readPinCodeForUser(int userId) async {
+    return await _storage.read(key: 'pinCode_$userId');
+  }
+
+  static Future<void> deletePinCodeForUser(int userId) async {
+    await _storage.delete(key: 'pinCode_$userId');
+  }
 }

@@ -122,6 +122,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final httpResponse = await _authService.setPin(setPinRequestModel);
       if (httpResponse.response.statusCode == 200) {
+        await SecureStorage.savePinCodeForUser(
+            setPinRequestModel.userId, setPinRequestModel.pinCode);
         return DataSuccess(httpResponse.data);
       } else {
         return DataFailed(
