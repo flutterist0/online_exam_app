@@ -48,6 +48,10 @@ class _ExamDetailViewState extends State<ExamDetailView> {
           final exams = state.examDetailModel!.data;
           if (exams == null) {
             return const Center(child: Text('No exams available'));
+          } else if (state.errorMessage != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _showAlreadyParticipatedDialog(context);
+            });
           }
           return Scaffold(
             bottomNavigationBar: Padding(
@@ -174,6 +178,27 @@ class _ExamDetailViewState extends State<ExamDetailView> {
           child: Text('No data available'),
         );
       }),
+    );
+  }
+
+  void _showAlreadyParticipatedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Xəbərdarlıq"),
+          content: const Text("Siz artıq bu imtahanda iştirak etmisiniz."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+              child: const Text("Bağla"),
+            ),
+          ],
+        );
+      },
     );
   }
 

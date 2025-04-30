@@ -31,6 +31,10 @@ ExamsResultsModelData _$ExamsResultsModelDataFromJson(
       correctAnswers: (json['correctAnswers'] as num?)?.toInt(),
       totalAnswers: (json['totalAnswers'] as num?)?.toInt(),
       score: (json['score'] as num?)?.toInt(),
+      examTitle: json['examTitle'] as String?,
+      createdDate: json['createdDate'] == null
+          ? null
+          : DateTime.parse(json['createdDate'] as String),
       questions: (json['questions'] as List<dynamic>?)
           ?.map((e) => ExamsResultsModelDataQuestions.fromJson(
               e as Map<String, dynamic>))
@@ -45,6 +49,8 @@ Map<String, dynamic> _$ExamsResultsModelDataToJson(
       'correctAnswers': instance.correctAnswers,
       'totalAnswers': instance.totalAnswers,
       'score': instance.score,
+      'examTitle': instance.examTitle,
+      'createdDate': instance.createdDate?.toIso8601String(),
       'questions': instance.questions,
     };
 

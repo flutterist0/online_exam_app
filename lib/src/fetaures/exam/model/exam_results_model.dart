@@ -30,6 +30,8 @@ class ExamsResultsModelData extends Equatable {
   final int? correctAnswers;
   final int? totalAnswers;
   final int? score;
+  final String? examTitle;
+  final DateTime? createdDate;
   final List<ExamsResultsModelDataQuestions>? questions;
 
   ExamsResultsModelData({
@@ -38,6 +40,8 @@ class ExamsResultsModelData extends Equatable {
     this.correctAnswers,
     this.totalAnswers,
     this.score,
+    this.examTitle,
+    this.createdDate,
     this.questions,
   });
   factory ExamsResultsModelData.fromJson(Map<String, dynamic> json) =>
@@ -47,8 +51,16 @@ class ExamsResultsModelData extends Equatable {
 
   @override
   // TODO: implement props
-  List<Object?> get props =>
-      [examId, userId, correctAnswers, totalAnswers, score, questions];
+  List<Object?> get props => [
+        examId,
+        userId,
+        correctAnswers,
+        totalAnswers,
+        score,
+        questions,
+        examTitle,
+        createdDate
+      ];
 }
 
 @JsonSerializable()

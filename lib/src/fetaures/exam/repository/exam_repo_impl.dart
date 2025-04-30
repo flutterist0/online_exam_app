@@ -140,6 +140,7 @@ class ExamRepositoryImpl implements ExamRepository {
     try {
       final httpResponse = await _examService.getExamResults(userId);
       if (httpResponse.response.statusCode == 200) {
+        print('ExamResultsModel: ${httpResponse.data.data}');
         return DataSuccess(httpResponse.data);
       } else {
         return DataFailed(

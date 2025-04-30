@@ -17,8 +17,7 @@ class ExamsResultsView extends StatefulWidget {
 class _ExamsResultsViewState extends State<ExamsResultsView> {
   int? userId;
   final Map<int, bool> _examResultsVisibility = {};
-  final Map<int, ExamResultModel?> _examResults =
-      {}; // Hər exam üçün nəticə saxlayırıq.
+  final Map<int, ExamResultModel?> _examResults = {};
 
   @override
   void initState() {
@@ -67,21 +66,29 @@ class _ExamsResultsViewState extends State<ExamsResultsView> {
             if (state.isLoading) {
               return const Center(child: CircularProgressIndicator());
             }
-
-            final exams = state.examModel?.data
-                ?.where((exam) =>
-                    exam.isDeleted == false && exam.hasParticipated == true)
-                .toList();
-            ;
-            if (exams == null || exams.isEmpty) {
+            if (state.errorMessage != null) {
+              return Center(child: Text('Error: ${state.errorMessage}'));
+            }
+            if (state.examModel == null) {
               return const Center(child: Text("No exams available"));
             }
 
+            // final exams = state.examModel?.data
+            //     ?.where((exam) => exam.isDeleted == false)
+            //     .toList();
+            // ;
+            // if (exams == null || exams.isEmpty) {
+            //   return const Center(child: Text("No exams available"));
+            // }
+            // final exams = state.examResultsModel?.data;
+
             return ListView.builder(
-              itemCount: exams.length,
+              itemCount: state.examResultsModel?.data?.length,
               itemBuilder: (context, index) {
-                final exam = exams[index];
-                _examResultsVisibility.putIfAbsent(exam.id!, () => false);
+                final exam = state.examResultsModel?.data?[index];
+
+                _examResultsVisibility.putIfAbsent(
+                    exam?.examId ?? 0, () => false);
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,21 +98,22 @@ class _ExamsResultsViewState extends State<ExamsResultsView> {
                           vertical: 10, horizontal: 16),
                       elevation: 5,
                       child: ListTile(
-                        title: Text(exam.title ?? 'No title'),
+                        title: Text(exam?.examTitle ?? 'No title'),
                         subtitle: Text(
-                            "Date: ${DateFormat('dd MMMM yyyy').format(exam.createdTime!)}"),
+                            "Date: ${DateFormat('dd MMMM yyyy').format(exam?.createdDate ?? DateTime.now())}"),
                         trailing: IconButton(
                           icon: Icon(
-                            _examResultsVisibility[exam.id]!
+                            _examResultsVisibility[exam?.examId!] ?? false
                                 ? Icons.expand_less
                                 : Icons.expand_more,
                           ),
-                          onPressed: () => toggleExamResultVisibility(exam.id!),
+                          onPressed: () =>
+                              toggleExamResultVisibility(exam?.examId ?? 0),
                         ),
                       ),
                     ),
-                    if (_examResultsVisibility[exam.id] == true)
-                      _buildExamResult(exam.id!),
+                    if (_examResultsVisibility[exam?.examId] == true)
+                      _buildExamResult(exam?.examId ?? 0),
                   ],
                 );
               },

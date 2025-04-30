@@ -1,6 +1,7 @@
 abstract class UrlConst {
   //10.0.2.2
-  static const String baseUrl = 'https://10.0.2.2:7010/api/';
+  //https://10.0.2.2:7010/api/
+  static const String baseUrl = 'https://elmir01.bsite.net/api/';
   static const String login = 'Auth/login/';
   static const String register = 'Auth/register/';
   static const String getAllExams = 'Exam/getAllExams/';

@@ -21,6 +21,8 @@ class ExamsView extends StatefulWidget {
 }
 
 class _ExamsViewState extends State<ExamsView> {
+  int? userId;
+
   @override
   void initState() {
     super.initState();
@@ -29,6 +31,14 @@ class _ExamsViewState extends State<ExamsView> {
 
   Future<void> _refreshExams() async {
     BlocProvider.of<ExamBloc>(context).add(const GetAllExams());
+  }
+
+  void getUserIdAndFetchExams() async {
+    userId = await SecureStorage.readUserId();
+    if (userId != null) {
+      BlocProvider.of<ExamBloc>(context)
+          .add(GetExamsResultsEvent(userId: userId));
+    }
   }
 
   @override
@@ -40,6 +50,15 @@ class _ExamsViewState extends State<ExamsView> {
           backgroundColor: Colors.deepPurple,
           title: const Text('Exams'),
           actions: [
+            IconButton(
+              icon: Icon(
+                Icons.abc_sharp,
+                color: Colors.red,
+              ),
+              onPressed: () {
+                getUserIdAndFetchExams();
+              },
+            ),
             IconButton(
               onPressed: () async {
                 BlocProvider.of<AuthBloc>(context).add(const LogoutRequested());
@@ -70,11 +89,16 @@ class _ExamsViewState extends State<ExamsView> {
           if (state.isLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state.errorMessage != null) {
-            return Center(child: Text('Error: ${state.errorMessage}'));
+            return Center(
+                child: IconButton(
+              onPressed: () {
+                _refreshExams();
+              },
+              icon: Icon(Icons.refresh),
+            ));
           } else if (state.examModel != null) {
             final exams = state.examModel!.data
-                ?.where((exam) =>
-                    exam.isDeleted == false && exam.hasParticipated == false)
+                ?.where((exam) => exam.isDeleted == false)
                 .toList();
 
             if (exams == null || exams.isEmpty) {
@@ -94,21 +118,21 @@ class _ExamsViewState extends State<ExamsView> {
                   date: exam.createdTime ?? DateTime.now(),
                   onTap: () {
                     // Only allow navigation if the user hasn't participated
-                    if (!hasParticipated) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BlocProvider.value(
-                            value: BlocProvider.of<ExamBloc>(context),
-                            child: ExamDetailView(
-                              examId: exam.id,
-                            ),
+                    // if (!hasParticipated) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BlocProvider.value(
+                          value: BlocProvider.of<ExamBloc>(context),
+                          child: ExamDetailView(
+                            examId: exam.id,
                           ),
                         ),
-                      );
-                    }
+                      ),
+                    );
+                    // }
                   },
-                  icon: hasParticipated ? Icons.lock : null,
+                  // icon: Icons.lock,
                 );
               },
             );
